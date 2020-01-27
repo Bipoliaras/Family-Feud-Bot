@@ -128,7 +128,7 @@ public class QuestionService {
 
     SlackHistoryResponse response = objectMapper.readValue(slackHistoryResponse.getBody(), SlackHistoryResponse.class);
 
-    response.getMessages().stream().map(message -> message.getText()).forEach(checkAnswer());
+    response.getMessages().forEach(this::checkAnswer);
 
   }
 
