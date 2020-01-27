@@ -1,5 +1,8 @@
 package com.ernestas.familyfeudbot;
 
+import com.ernestas.familyfeudbot.slack.SlackConversationHistoryResponse;
+import com.ernestas.familyfeudbot.slack.SlackEndpoint;
+import com.ernestas.familyfeudbot.slack.SlackMessage;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
@@ -11,12 +14,11 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
-import org.apache.coyote.Response;
-import org.apache.logging.log4j.message.Message;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -32,13 +34,6 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class QuestionService {
 
-  private String secretKey;
-
-  @Value("${slack.secret.key}")
-  public void setSecretKey(String secretKey) {
-    this.secretKey = secretKey;
-  }
-
   private ArrayList<Question> questionList = new ArrayList<>();
 
   private Question currentQuestion;
@@ -46,9 +41,14 @@ public class QuestionService {
 
   private Random random = new Random();
 
-  private final String FAMILY_FEUD_CHANNEL = "CSSUB5Z8U";
-
   private RestTemplate restTemplate = new RestTemplate();
+
+  private SlackEndpoint slackEndpoint;
+
+  @Autowired
+  public void setSlackEndpoint(SlackEndpoint slackEndpoint) {
+    this.slackEndpoint = slackEndpoint;
+  }
 
 
   @PostConstruct
@@ -90,71 +90,41 @@ public class QuestionService {
 
   @Scheduled(fixedRate = 20000)
   public void askQuestions() {
-    HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.add("Authorization", "Bearer " + secretKey);
-    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-    HashMap<String, String> jsonEntity = new HashMap<>();
-    jsonEntity.put("channel", FAMILY_FEUD_CHANNEL);
+    currentQuestion = questionList.get(random.nextInt(questionList.size()));
 
-    Question currentQuestion = questionList.get(random.nextInt(questionList.size()));
+    System.out.println(currentQuestion);
 
-    jsonEntity.put("text", currentQuestion.getQuestionText());
-
-    HttpEntity<HashMap> request = new HttpEntity<>(jsonEntity, httpHeaders);
-
-    restTemplate.postForEntity("https://slack.com/api/chat.postMessage", request, String.class);
+    slackEndpoint.askQuestion(currentQuestion);
 
   }
 
-  @Scheduled(fixedRate = 4000)
+  @Scheduled(fixedRate = 5000, initialDelay = 10000)
   public void monitorChat() throws Exception {
-
-    HttpHeaders httpHeaders = new HttpHeaders();
-    httpHeaders.add("Authorization", "Bearer " + secretKey);
-    httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-    LinkedMultiValueMap<String, String> jsonEntity = new LinkedMultiValueMap<>();
-    jsonEntity.add("channel", FAMILY_FEUD_CHANNEL);
-    jsonEntity.add("oldest", currentTime.toString());
-    jsonEntity.add("limit","50");
-
-    HttpEntity<LinkedMultiValueMap> request = new HttpEntity<>(jsonEntity, httpHeaders);
-
-    ResponseEntity<String> slackHistoryResponse = restTemplate.postForEntity("https://slack.com/api/conversations.history", request, String.class);
-
-    ObjectMapper objectMapper = new ObjectMapper().configure(
-        DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-    SlackHistoryResponse response = objectMapper.readValue(slackHistoryResponse.getBody(), SlackHistoryResponse.class);
-
-    response.getMessages().forEach(this::checkAnswer);
-
+    slackEndpoint.getConversationHistoryResponse()
+        .getMessages()
+        .forEach(this::checkAnswer);
   }
 
   private void checkAnswer(SlackMessage message) {
 
     currentQuestion.getAnswerList().stream()
         .filter(answer -> answer.getAnswerType().equals(AnswerType.UNANSWERED))
-        .filter(answer -> answer.getAnswerText().contains(message.getText()))
+        .filter(answer -> answer.getAnswerText().equals(message.getText()))
         .findFirst()
-        .ifPresentOrElse(
-            System.out::println,
-            () -> System.out.println("nope")
+        .ifPresent(
+            answer ->
+            {
+              answer.setAnswerType(AnswerType.ANSWERED);
+              awardPoints(message);
+            }
         );
-
-
-
-
 
   }
 
-
-
-
-
-
-
+  private void awardPoints(SlackMessage message) {
+    slackEndpoint.replyToUser(message);
+  }
 
   private String getCellValue(Cell cell) {
     switch (cell.getCellType()) {
