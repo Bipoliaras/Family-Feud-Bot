@@ -1,6 +1,6 @@
 package com.ernestas.familyfeudbot.slack;
 
-import com.ernestas.familyfeudbot.Question;
+import com.ernestas.familyfeudbot.question.Question;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;

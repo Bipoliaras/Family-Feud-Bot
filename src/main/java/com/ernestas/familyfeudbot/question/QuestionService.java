@@ -1,14 +1,12 @@
-package com.ernestas.familyfeudbot;
+package com.ernestas.familyfeudbot.question;
 
-import com.ernestas.familyfeudbot.slack.SlackConversationHistoryResponse;
+import com.ernestas.familyfeudbot.answer.Answer;
+import com.ernestas.familyfeudbot.answer.AnswerType;
 import com.ernestas.familyfeudbot.slack.SlackEndpoint;
 import com.ernestas.familyfeudbot.slack.SlackMessage;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Level;
@@ -19,16 +17,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -37,11 +29,8 @@ public class QuestionService {
   private ArrayList<Question> questionList = new ArrayList<>();
 
   private Question currentQuestion;
-  private Instant currentTime;
 
   private Random random = new Random();
-
-  private RestTemplate restTemplate = new RestTemplate();
 
   private SlackEndpoint slackEndpoint;
 
@@ -93,8 +82,6 @@ public class QuestionService {
 
     currentQuestion = questionList.get(random.nextInt(questionList.size()));
 
-    System.out.println(currentQuestion);
-
     slackEndpoint.askQuestion(currentQuestion);
 
   }
@@ -119,7 +106,6 @@ public class QuestionService {
               awardPoints(message);
             }
         );
-
   }
 
   private void awardPoints(SlackMessage message) {
@@ -135,6 +121,10 @@ public class QuestionService {
       default:
         return "";
     }
+  }
+
+  public void setCurrentQuestion(Question currentQuestion) {
+    this.currentQuestion = currentQuestion;
   }
 
 

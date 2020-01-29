@@ -1,5 +1,6 @@
-package com.ernestas.familyfeudbot;
+package com.ernestas.familyfeudbot.question;
 
+import com.ernestas.familyfeudbot.answer.Answer;
 import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
