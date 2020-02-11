@@ -2,6 +2,8 @@ package com.ernestas.familyfeudbot.question;
 
 import static org.mockito.Mockito.when;
 
+import com.ernestas.familyfeudbot.answer.Answer;
+import com.ernestas.familyfeudbot.answer.AnswerType;
 import com.ernestas.familyfeudbot.slack.SlackConversationHistoryResponse;
 import com.ernestas.familyfeudbot.slack.SlackEndpoint;
 import com.ernestas.familyfeudbot.slack.SlackMessage;
@@ -22,7 +24,14 @@ public class QuestionServiceTests {
   @Before
   public void setup() throws Exception {
     questionService = new QuestionService();
-    questionService.loadQuestions();
+
+    questionService.setCurrentQuestion(Question.builder()
+    .questionText("Name a big animal encounter in the United states")
+    .answerList(List.of(
+        Answer.builder().answerText("Donkey").points(15.0).answerType(AnswerType.UNANSWERED).build(),
+        Answer.builder().answerText("Kangaroo").points(25.0).answerType(AnswerType.UNANSWERED).build(),
+        Answer.builder().answerText("Hippo").points(35.0).answerType(AnswerType.UNANSWERED).build()
+    )).build());
 
     slackEndpoint = Mockito.mock(SlackEndpoint.class);
     when(slackEndpoint.getConversationHistoryResponse()).thenReturn(
@@ -40,7 +49,19 @@ public class QuestionServiceTests {
 
   @Test
   public void questionServiceAskQuestionOk() {
+
+    questionService.setQuestionList(List.of(
+        Question.builder()
+            .questionText("Name a big animal encounter in the United states")
+            .answerList(List.of(
+                Answer.builder().answerText("Donkey").points(15.0).answerType(AnswerType.UNANSWERED).build(),
+                Answer.builder().answerText("Kangaroo").points(25.0).answerType(AnswerType.UNANSWERED).build(),
+                Answer.builder().answerText("Hippo").points(35.0).answerType(AnswerType.UNANSWERED).build()
+            )).build()
+    ));
+
     questionService.askQuestions();
+
     Mockito.verify(slackEndpoint, Mockito.times(1)).askQuestion(Mockito.any());
   }
 
@@ -48,7 +69,8 @@ public class QuestionServiceTests {
   public void questionServiceMonitorChatOk() throws Exception {
     Question question = new Question();
     question.setQuestionText("K?");
-    question.setAnswerList();
+    question.setAnswerList(List.of(Answer.builder().answerText("parrot").points(20.0).answerType(
+        AnswerType.UNANSWERED).build()));
     questionService.monitorChat();
   }
 }

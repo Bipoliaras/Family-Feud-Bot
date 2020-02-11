@@ -4,10 +4,12 @@ import com.ernestas.familyfeudbot.answer.Answer;
 import com.ernestas.familyfeudbot.answer.AnswerType;
 import com.ernestas.familyfeudbot.slack.SlackEndpoint;
 import com.ernestas.familyfeudbot.slack.SlackMessage;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import java.io.InputStream;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,18 +23,19 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class QuestionService {
 
-  private ArrayList<Question> questionList = new ArrayList<>();
+  private List<Question> questionList = new ArrayList<>();
 
   private Question currentQuestion;
 
   private Random random = new Random();
 
   private SlackEndpoint slackEndpoint;
+
+  private HazelcastInstance instance = Hazelcast.newHazelcastInstance();
 
   @Autowired
   public void setSlackEndpoint(SlackEndpoint slackEndpoint) {
@@ -125,6 +128,10 @@ public class QuestionService {
 
   public void setCurrentQuestion(Question currentQuestion) {
     this.currentQuestion = currentQuestion;
+  }
+
+  public void setQuestionList(List<Question> questionList) {
+    this.questionList = questionList;
   }
 
 

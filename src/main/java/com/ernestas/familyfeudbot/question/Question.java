@@ -2,6 +2,7 @@ package com.ernestas.familyfeudbot.question;
 
 import com.ernestas.familyfeudbot.answer.Answer;
 import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Question {
   private String questionText;
-  private ArrayList<Answer> answerList = new ArrayList<>();
+  private List<Answer> answerList;
 }

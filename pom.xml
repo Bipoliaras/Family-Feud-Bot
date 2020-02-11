@@ -42,6 +42,18 @@
       <version>2.2.4.RELEASE</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast</artifactId>
+      <version>4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast-client</artifactId>
+      <version>3.12.6</version>
+    </dependency>
+
+
   </dependencies>
 
   <build>
@@ -52,6 +64,16 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>3.0.0-M4</version>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <properties>
     <maven.compiler.target>11</maven.compiler.target>
