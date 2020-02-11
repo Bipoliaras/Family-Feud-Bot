@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Question {
   private String questionText;
-  private List<Answer> answerList;
+  private List<Answer> answerList = new ArrayList<>();
 }

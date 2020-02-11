@@ -1,12 +1,15 @@
 package com.ernestas.familyfeudbot.slack;
 
-import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SlackConversationHistoryResponse {
   private List<SlackMessage> messages;
 }

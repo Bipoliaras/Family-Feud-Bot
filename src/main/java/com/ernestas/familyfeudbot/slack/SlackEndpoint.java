@@ -1,5 +1,6 @@
 package com.ernestas.familyfeudbot.slack;
 
+import com.ernestas.familyfeudbot.answer.Answer;
 import com.ernestas.familyfeudbot.question.Question;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,14 +71,14 @@ public class SlackEndpoint {
 
   }
 
-  public void replyToUser(SlackMessage slackMessage) {
+  public void replyToUser(SlackMessage slackMessage, Answer answer) {
     HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.add("Authorization", "Bearer " + secretKey);
     httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
     HashMap<String, String> jsonEntity = new HashMap<>();
     jsonEntity.put("channel", FAMILY_FEUD_CHANNEL);
-    jsonEntity.put("text", "Groovy baby!");
+    jsonEntity.put("text", "Good job! You get " + answer.getPoints() + " points");
     jsonEntity.put("thread_ts", slackMessage.getTs());
 
     HttpEntity<HashMap> request = new HttpEntity<>(jsonEntity, httpHeaders);
