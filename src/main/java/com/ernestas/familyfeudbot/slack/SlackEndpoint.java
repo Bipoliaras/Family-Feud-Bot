@@ -29,7 +29,7 @@ public class SlackEndpoint {
   private ObjectMapper objectMapper =
       new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-  private final String FAMILY_FEUD_CHANNEL = "CSSUB5Z8U";
+  private static final String FAMILY_FEUD_CHANNEL = "CSSUB5Z8U";
 
   private static final int MESSAGE_LIMIT = 50;
 
@@ -49,10 +49,7 @@ public class SlackEndpoint {
         restTemplate.postForEntity(
             "https://slack.com/api/conversations.history", request, String.class);
 
-    SlackConversationHistoryResponse response =
-        objectMapper.readValue(slackHistoryResponse.getBody(), SlackConversationHistoryResponse.class);
-
-    return response;
+    return objectMapper.readValue(slackHistoryResponse.getBody(), SlackConversationHistoryResponse.class);
   }
 
   public void askQuestion(Question question) {
