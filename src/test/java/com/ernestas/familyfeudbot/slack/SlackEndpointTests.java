@@ -1,4 +1,4 @@
-package com.ernestas.familyfeudbot.question;
+package com.ernestas.familyfeudbot.slack;
 
 import com.ernestas.familyfeudbot.answer.Answer;
 import com.ernestas.familyfeudbot.slack.SlackEndpoint;
