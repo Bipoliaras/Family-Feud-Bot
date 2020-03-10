@@ -1,4 +1,4 @@
-package com.ernestas.familyfeudbot.award;
+package com.ernestas.familyfeudbot.question;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

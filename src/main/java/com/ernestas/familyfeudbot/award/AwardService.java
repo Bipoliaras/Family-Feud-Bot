@@ -15,15 +15,13 @@ public class AwardService {
     this.playerRepository = playerRepository;
   }
 
-  public Player awardPoints(String name, double points) {
+  public void awardPoints(String name, double points) {
     playerRepository
         .findById(name)
         .ifPresentOrElse(
             player -> updatePlayerPoints(player, points),
             () -> createNewPlayer(name, points)
         );
-
-    return playerRepository.findById(name).get();
   }
 
   private void updatePlayerPoints(Player player, double points) {
@@ -37,12 +35,4 @@ public class AwardService {
     player.setPlayerName(name);
     playerRepository.save(player);
   }
-
-  public void resetPlayerPoints() {
-    for(Player player : playerRepository.findAll()) {
-      player.setPoints(0);
-      playerRepository.save(player);
-    }
-  }
-
 }
