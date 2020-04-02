@@ -5,7 +5,6 @@ import com.ernestas.familyfeudbot.question.Question;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashMap;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,12 +113,12 @@ public class SlackEndpoint {
 
   public void replyToUser(SlackMessage slackMessage, Answer answer) {
 
-    HashMap<String, String> jsonEntity = new HashMap<>();
-    jsonEntity.put("channel", FAMILY_FEUD_CHANNEL);
-    jsonEntity.put("text", "Good job! You get " + answer.getPoints() + " points");
-    jsonEntity.put("thread_ts", slackMessage.getTs());
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put("channel", FAMILY_FEUD_CHANNEL);
+    jsonObject.put("text", "Good job! You get " + answer.getPoints() + " points");
+    jsonObject.put("thread_ts", slackMessage.getTs());
 
-    HttpEntity<HashMap> request = new HttpEntity<>(jsonEntity, getHeaders());
+    HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), getHeaders());
 
     restTemplate.postForEntity(SlackUrls.POST_MESSAGE.getUrl(), request, String.class);
   }

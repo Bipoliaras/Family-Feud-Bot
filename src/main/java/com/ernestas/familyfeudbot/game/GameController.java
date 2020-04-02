@@ -26,7 +26,7 @@ public class GameController {
 
   @PostMapping("/play")
   public void play() {
-    questionService.setQuestionList(questionLoader.getQuestions());
+    questionLoader.loadQuestions();
   }
 
 
